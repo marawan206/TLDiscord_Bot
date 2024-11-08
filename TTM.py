@@ -22,7 +22,7 @@ ADMIN_ROLE_ID = <SPECIFY IF NEEDED>       # Normal Admin Role
 HIGHER_ADMIN_ROLE_ID = <SPECIFY IF NEEDED>  # Higher Admin Role
 MEMBER_ROLE_ID = <SPECIFY IF NEEDED>
 
-# Announcement channel and David's ID
+# Announcement channel and Admin ID to be tracked by NLP
 WATCHED_CHANNEL_ID = <SPECIFY IF NEEDED>
 TARGET_USER_ID = <SPECIFY IF NEEDED>
 
@@ -30,6 +30,23 @@ TARGET_USER_ID = <SPECIFY IF NEEDED>
 TEXT_CHANNEL_ID = <SPECIFY IF NEEDED>
 VOICE_CHANNEL_ID = <SPECIFY IF NEEDED>
 
+# Load team data from a JSON file
+def load_teams():
+    try:
+        with open("teams.json", "r", encoding="utf-8") as file:  # Specify UTF-8 encoding
+            return json.load(file)
+    except UnicodeDecodeError as e:
+        print(f"Error loading teams.json: Encoding issue - {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error loading teams.json: Invalid JSON format - {e}")
+    except Exception as e:
+        print(f"Error loading teams.json: {e}")
+    return {}
+
+teams = load_teams()
+
+# Attendance data file
+ATTENDANCE_FILE = "attendance.json"
      
 # Run the bot
 bot.run(TOKEN)
