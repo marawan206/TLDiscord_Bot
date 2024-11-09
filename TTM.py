@@ -22,7 +22,7 @@ ADMIN_ROLE_ID = <SPECIFY IF NEEDED>       # Normal Admin Role
 HIGHER_ADMIN_ROLE_ID = <SPECIFY IF NEEDED>  # Higher Admin Role
 MEMBER_ROLE_ID = <SPECIFY IF NEEDED>
 
-# Announcement channel and Admin ID to be tracked by NLP
+# Announcement channel and David's ID
 WATCHED_CHANNEL_ID = <SPECIFY IF NEEDED>
 TARGET_USER_ID = <SPECIFY IF NEEDED>
 
@@ -84,6 +84,12 @@ def save_attendance(event_name, attendees):
     # Write the updated data back to the file
     with open("attendance.json", "w", encoding="utf-8") as file:
         json.dump(attendance_data, file, indent=4, ensure_ascii=False)
+
+# Attendance data
+attendance_data = load_attendance()
+
+# Groq Client Setup
+client = Groq(api_key=GROQ_API_KEY)
      
 # Run the bot
 bot.run(TOKEN)
