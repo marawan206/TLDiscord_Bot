@@ -90,6 +90,30 @@ attendance_data = load_attendance()
 
 # Groq Client Setup
 client = Groq(api_key=GROQ_API_KEY)
-     
+
+# Helper Function: Append events to schedule.json
+def append_to_schedule(events):
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        schedule = {}
+
+        # Load existing schedule if file exists
+        if os.path.exists("schedule.json"):
+            with open("schedule.json", "r") as file:
+                schedule = json.load(file)
+
+        # Append events to today's schedule
+        if today not in schedule:
+            schedule[today] = []
+
+        schedule[today].extend(events)
+
+        # Save the updated schedule
+        with open("schedule.json", "w") as file:
+            json.dump(schedule, file, indent=4)
+    except Exception as e:
+        print(f"Error updating schedule.json: {e}")
+
+
 # Run the bot
 bot.run(TOKEN)
