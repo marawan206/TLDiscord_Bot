@@ -114,6 +114,44 @@ def append_to_schedule(events):
     except Exception as e:
         print(f"Error updating schedule.json: {e}")
 
+# Helper Function: Process message with Groq API
+def process_with_groq(message_content):
+    try:
+        # Send the message to Groq's LLM for processing
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": ("Extract structured event data from the following message. "
+                                "Respond ONLY with a JSON array containing objects. Each object must have keys: "
+                                "'name' (event title), 'time' (HH:MM), and 'description' (event details). "
+                                "Do not include any other text or explanation in the response. "
+                                f"Message: {message_content}")
+                }
+            ],
+            model="llama3-8b-8192",
+        )
+
+        # Get the response and clean it
+        response = chat_completion.choices[0].message.content
+        print(f"Groq API Raw Response: {response}")  # Debug: Log the full response
+
+        # Use regex to extract JSON from the response
+        json_match = re.search(r"```(?:json)?\n([\s\S]*?)```", response)  # Matches JSON in code blocks
+        if json_match:
+            clean_json = json_match.group(1)
+        else:
+            clean_json = response.strip()  # Fallback: Assume response is already clean JSON
+
+        print(f"Extracted JSON: {clean_json}")  # Debug: Log cleaned JSON
+        return json.loads(clean_json)  # Parse the cleaned JSON
+    except json.JSONDecodeError as e:
+        print(f"JSON Decode Error: {e}")
+        print(f"Raw Response After Cleaning: {clean_json}")
+    except Exception as e:
+        print(f"Error processing message with Groq API: {e}")
+    return []
+
 
 # Run the bot
 bot.run(TOKEN)
