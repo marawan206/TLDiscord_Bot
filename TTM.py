@@ -153,5 +153,25 @@ def process_with_groq(message_content):
     return []
 
 
+# Event Listener: On Message
+@bot.event
+async def on_message(message):
+    if message.channel.id == WATCHED_CHANNEL_ID and message.author.id == TARGET_USER_ID:
+        print("Detected message from target user. Processing...")
+        events = process_with_groq(message.content)
+        
+        # Debugging: Print extracted events
+        print(f"Extracted events: {events}")
+
+        if events:
+            append_to_schedule(events)
+            await message.channel.send("✅ Events successfully added to the schedule!")
+        else:
+            await message.channel.send("❌ Could not process the message or extract events.")
+    
+    # Process other commands
+    await bot.process_commands(message)
+
+
 # Run the bot
 bot.run(TOKEN)
