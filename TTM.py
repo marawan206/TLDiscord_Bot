@@ -172,6 +172,12 @@ async def on_message(message):
     # Process other commands
     await bot.process_commands(message)
 
+    
+# Helper function to check for admin role or higher admin role
+def is_admin(ctx):
+    admin_role = discord.utils.get(ctx.guild.roles, id=ADMIN_ROLE_ID)
+    higher_admin_role = discord.utils.get(ctx.guild.roles, id=HIGHER_ADMIN_ROLE_ID)
+    return admin_role in ctx.author.roles or higher_admin_role in ctx.author.roles
 
 # Run the bot
 bot.run(TOKEN)
