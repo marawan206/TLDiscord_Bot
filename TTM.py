@@ -195,6 +195,25 @@ async def show_commands(ctx):
     response += "**!allteams** - Show all teams and their members\n"
     response += "**!suggest** - Analyze teams and suggest fillers based on voice channel\n\n"
     
+    # VOD Commands
+    response += "**VOD Commands:**\n"
+    response += "**!vodlink <vod_name> <link>** - Submit your VOD link\n"
+    response += "**!listvods** - Show all available VODs and submission counts\n\n"
+    
+    # Admin Commands
+    response += "**Admin Commands:**\n"
+    response += "**!attendance [event_name]** - Record attendance from voice channel\n"
+    response += "**!add <name> <time> [description]** - Add a new event\n"
+    response += "**!details <username>** - Show detailed attendance for a user\n"
+    response += "**!addvod <vod_name>** - Add a new VOD category\n"
+    response += "**!vodinfo <vod_name>** - Show all submissions for a VOD\n\n"
+    
+    # Examples
+    response += "**Examples:**\n"
+    response += "`!whois KingTetrax`\n"
+    response += "`!add \"Guild Event\" 19:00 Weekly guild meeting`\n"
+    response += "`!vodlink \"Castle Siege 2024-01-10\" https://youtube.com/...`\n"
+    
     await ctx.send(response)
 
 # Run the bot
