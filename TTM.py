@@ -179,5 +179,23 @@ def is_admin(ctx):
     higher_admin_role = discord.utils.get(ctx.guild.roles, id=HIGHER_ADMIN_ROLE_ID)
     return admin_role in ctx.author.roles or higher_admin_role in ctx.author.roles
 
+
+# Command: Show Commands List
+@bot.command(name="commands")
+async def show_commands(ctx):
+    response = "**Available Commands:**\n\n"
+    
+    # General Commands
+    response += "**General Commands:**\n"
+    response += "**!commands** - Show this help message\n"
+    response += "**!today** - Show today's scheduled events\n"
+    response += "**!whois <username>** - Show the role and team of a user\n"
+    response += "**!myteam** - Show your team's members\n"
+    response += "**!myatt** - Show your personal attendance statistics\n"
+    response += "**!allteams** - Show all teams and their members\n"
+    response += "**!suggest** - Analyze teams and suggest fillers based on voice channel\n\n"
+    
+    await ctx.send(response)
+
 # Run the bot
 bot.run(TOKEN)
