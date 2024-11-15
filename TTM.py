@@ -216,5 +216,69 @@ async def show_commands(ctx):
     
     await ctx.send(response)
 
+# Command: Add a new event (Admins only)
+@bot.command(name="add")
+@commands.check(is_admin)
+async def add_event(ctx, name: str = None, time: str = None, *, description: str = ""):
+    if not name or not time:
+        await ctx.send("❌ Usage: `!add <name> <time (HH:MM)> [description]`")
+        return
+
+    try:
+        # Parse and save event
+        event = {
+            "name": name,
+            "time": time,
+            "description": description
+        }
+        with open("schedule.json", "r+") as file:
+            schedule = json.load(file)
+            today = datetime.now().strftime("%Y-%m-%d")
+            if today not in schedule:
+                schedule[today] = []
+            schedule[today].append(event)
+            file.seek(0)
+            json.dump(schedule, file, indent=4)
+
+        await ctx.send(f"✅ Event '{name}' added for {time}!")
+    except Exception as e:
+        await ctx.send(f"❌ Failed to add event: {e}")
+
+@add_event.error
+async def add_event_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("❌ You don't have permission to use this command.")
+
+# Command: Show Attendance Summary (Admins only)
+# Command: Record attendance
+@bot.command(name="attendance")
+@commands.check(is_admin)  # Ensure this decorator is applied
+async def attendance(ctx, *, event_name: str = "default"):
+    # Get the voice channel
+    guild = ctx.guild
+    voice_channel = guild.get_channel(VOICE_CHANNEL_ID)
+
+    if not voice_channel:
+        await ctx.send("❌ Voice channel not found! Check the channel ID.")
+        return
+
+    # Get attendees in the voice channel
+    attendees = sorted([member.display_name for member in voice_channel.members])
+    if not attendees:
+        await ctx.send("❌ No attendees found in the voice channel.")
+        return
+
+    # Save attendance to JSON file
+    save_attendance(event_name, attendees)
+    
+    # Respond with attendance details
+    attendee_count = len(attendees)
+    attendee_list = ', '.join(attendees)
+    await ctx.send(
+        f"✅ Attendance for event '{event_name}' has been recorded!\n"
+        f"**Total Attendees:** {attendee_count}\n"
+        f"**Attendees:** {attendee_list}"
+    )
+
 # Run the bot
 bot.run(TOKEN)
