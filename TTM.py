@@ -280,5 +280,13 @@ async def attendance(ctx, *, event_name: str = "default"):
         f"**Attendees:** {attendee_list}"
     )
 
+# Handle errors for the attendance command
+@attendance.error
+async def attendance_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("❌ You don't have permission to use this command.")
+    else:
+        await ctx.send(f"❌ An error occurred: {str(error)}")
+
 # Run the bot
 bot.run(TOKEN)
