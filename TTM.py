@@ -288,5 +288,76 @@ async def attendance_error(ctx, error):
     else:
         await ctx.send(f"❌ An error occurred: {str(error)}")
 
+# Command: Show User Role and Team
+@bot.command(name="whois")
+async def whois(ctx, *, nickname: str = None):
+    if not nickname:
+        await ctx.send("❌ Usage: `!whois <nickname>`")
+        return
+
+    # Special case for "SPECIAL" 
+    if nickname.lower() == "SPECIAL":
+        await ctx.send("REAL GIGACHAD\nhttps://tenor.com/view/gigachad-chad-gif-20773266")
+        return
+
+    user_role = None
+    user_team = None
+    member_found = False
+
+    # Check for Discord nicknames or usernames
+    for member in ctx.guild.members:
+        if member.display_name.lower() == nickname.lower() or member.name.lower() == nickname.lower():
+            member_found = True
+            search_name = member.display_name
+            break
+
+    if not member_found:
+        await ctx.send(f"❌ No member found with the nickname or username: **{nickname}**.")
+        return
+
+    # Search for user in team data
+    for team, members in teams.items():
+        for member in members:
+            if member["name"].lower() == search_name.lower():
+                user_role = member["role"]
+                user_team = team
+                break
+
+    # Send user role and team info if found
+    if user_role and user_team:
+        response = f"**{search_name}** is a **{user_role}** and is currently assigned to **{user_team}**."
+        if user_team == "Bombers":
+            response += "\n**BOMBER GROUP** 💣"
+        await ctx.send(response)
+    else:
+        await ctx.send(f"❌ No information found for **{search_name}**.")
+
+
+# Command: Show Today's Events
+@bot.command(name="today")
+async def today(ctx):
+    try:
+        # Load schedule from file
+        with open("schedule.json", "r") as file:
+            schedule = json.load(file)
+
+        # Define today's date in CET
+        cet = pytz.timezone("CET")
+        today_date = datetime.now(cet).strftime("%Y-%m-%d")
+
+        if today_date not in schedule or not schedule[today_date]:
+            await ctx.send("✅ No events scheduled for today.")
+            return
+
+        # Build the response message
+        response = "**Today's Events (CET):**\n"
+        for event in schedule[today_date]:
+            response += f"- **{event['name']}**: {event['time']} | {event['description']}\n"
+
+        await ctx.send(response)
+    except Exception as e:
+        await ctx.send(f"❌ Error fetching today's events: {e}")
+
+
 # Run the bot
 bot.run(TOKEN)
