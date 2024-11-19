@@ -358,6 +358,98 @@ async def today(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error fetching today's events: {e}")
 
+# Command: Show My Team
+@bot.command(name="myteam")
+async def myteam(ctx):
+    user_name = ctx.author.display_name  # Use display name to match Discord nickname
 
+    # Find the user's team
+    user_team = None
+    for team, members in teams.items():
+        for member in members:
+            if member["name"].lower() == user_name.lower():  # Case-insensitive check
+                user_team = team
+                break
+        if user_team:
+            break
+
+    if not user_team:
+        await ctx.send("❌ You are not assigned to any team.")
+        return
+
+    # Get all team members
+    team_members = teams[user_team]
+    all_members = [member["name"] for member in team_members]
+
+    # Create response
+    response = f"**Your Team:** {user_team}\n"
+    response += f"**All Team Members:** {', '.join(all_members)}"
+
+    # Add special message for Bombers
+    if user_team == "Bombers":
+        response += "\n**BOMBER GROUP** 💣"
+
+    await ctx.send(response)
+
+   
+# Command: Check personal attendance
+@bot.command(name="myatt")
+async def my_attendance(ctx):
+    user_name = ctx.author.display_name
+    try:
+        # Load attendance data
+        with open("attendance.json", "r", encoding="utf-8") as file:
+            attendance_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        await ctx.send("No attendance records found.")
+        return
+
+    # Get the dates from your attendance data
+    dates = sorted(list(attendance_data.keys()))
+    if not dates:
+        await ctx.send("No attendance records found.")
+        return
+
+    # Get the most recent date
+    latest_date = datetime.strptime(dates[-1], "%Y-%m-%d").date()
+    
+    # Calculate week ranges based on the latest date
+    start_of_this_week = latest_date - timedelta(days=latest_date.weekday())
+    start_of_last_week = start_of_this_week - timedelta(days=7)
+    
+    days_this_week = [(start_of_this_week + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+    days_last_week = [(start_of_last_week + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
+    def calculate_attendance(days):
+        total_events = 0
+        attended_events = 0
+        missed_events = []
+
+        for day in days:
+            if day in attendance_data:
+                for event, details in attendance_data[day].items():
+                    total_events += 1
+                    if user_name in details["attendees"]:
+                        attended_events += 1
+                    else:
+                        missed_events.append(f"**{event}** at {details['time']} on {day}")
+            else:
+                missed_events.append(f"**No events recorded on {day}**")
+
+        attendance_percentage = (attended_events / total_events) * 100 if total_events > 0 else 0
+        return {
+            "total_events": total_events,
+            "attended_events": attended_events,
+            "attendance_percentage": attendance_percentage,
+            "missed_events": "\n".join(missed_events) if missed_events else "None",
+        }
+
+    # Calculate attendance for this week and last week
+    this_week_data = calculate_attendance(days_this_week)
+    last_week_data = calculate_attendance(days_last_week)
+
+    # Send the response
+    await ctx.send(response)
+        
 # Run the bot
 bot.run(TOKEN)
