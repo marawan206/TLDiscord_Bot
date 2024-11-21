@@ -474,6 +474,124 @@ async def my_attendance(ctx):
 
     # Send the response
     await ctx.send(response)
-           
+
+    
+@bot.command(name="details")
+@commands.has_permissions(administrator=True)
+async def details(ctx, discord_name: str):
+    try:
+        # Load attendance data
+        with open("attendance.json", "r", encoding="utf-8") as file:
+            attendance_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        await ctx.send("No attendance records found.")
+        return
+
+    try:
+        # Load team data
+        with open("teams.json", "r", encoding="utf-8") as file:
+            teams_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        await ctx.send("No team records found.")
+        return
+
+    # Find the user's team and role
+    user_team = "Not assigned"
+    user_role = "Not assigned"
+    for team, members in teams_data.items():
+        for member in members:
+            if member["name"].lower() == discord_name.lower():
+                user_team = team
+                user_role = member["role"]
+                break
+        if user_team != "Not assigned":
+            break
+
+    # Get the dates from your attendance data
+    dates = sorted(list(attendance_data.keys()))
+    if not dates:
+        await ctx.send("No attendance records found.")
+        return
+
+    # Get the most recent date
+    latest_date = datetime.strptime(dates[-1], "%Y-%m-%d").date()
+    
+    # Calculate week ranges based on the latest date
+    start_of_this_week = latest_date - timedelta(days=latest_date.weekday())
+    start_of_last_week = start_of_this_week - timedelta(days=7)
+    
+    days_this_week = [(start_of_this_week + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+    days_last_week = [(start_of_last_week + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
+    def calculate_attendance(days):
+        total_events = 0
+        attended_events = 0
+        missed_events = []
+        missed_days = set(days)
+
+        for day in days:
+            if day in attendance_data:
+                for event, details in attendance_data[day].items():
+                    total_events += 1
+                    if discord_name in details["attendees"]:
+                        attended_events += 1
+                        if day in missed_days:
+                            missed_days.remove(day)
+                    else:
+                        missed_events.append(
+                            f"**{event}** at {details['time']} on {day}"
+                        )
+
+        missed_days_list = "\n".join(missed_days) if missed_days else "None"
+        missed_events_list = "\n".join(missed_events) if missed_events else "None"
+        attendance_percentage = (attended_events / total_events) * 100 if total_events > 0 else 0
+
+        return {
+            "total_events": total_events,
+            "attended_events": attended_events,
+            "attendance_percentage": attendance_percentage,
+            "missed_days": missed_days_list,
+            "missed_events": missed_events_list,
+        }
+
+    # Calculate attendance for this week and last week
+    this_week_data = calculate_attendance(days_this_week)
+    last_week_data = calculate_attendance(days_last_week)
+
+    # Format responses for this week and last week
+    this_week_response = (
+        f"**This Week's Attendance Details:**\n"
+        f"Attendance Rate: **{this_week_data['attendance_percentage']:.2f}%**\n"
+        f"Total Events Attended: **{this_week_data['attended_events']}/{this_week_data['total_events']}**\n\n"
+        f"**Missed Days:**\n{this_week_data['missed_days']}\n\n"
+        f"**Missed Events:**\n{this_week_data['missed_events']}\n\n"
+        if this_week_data["total_events"] > 0
+        else "**This Week's Attendance Details:**\nNo attendance recorded this week yet.\n\n"
+    )
+
+    last_week_start_date = start_of_last_week.strftime("%Y-%m-%d")
+    last_week_response = (
+        f"**Last Week's Attendance Details (Week of {last_week_start_date}):**\n"
+        f"Attendance Rate: **{last_week_data['attendance_percentage']:.2f}%**\n"
+        f"Total Events Attended: **{last_week_data['attended_events']}/{last_week_data['total_events']}**\n\n"
+        f"**Missed Days:**\n{last_week_data['missed_days']}\n\n"
+        f"**Missed Events:**\n{last_week_data['missed_events']}\n\n"
+        if last_week_data["total_events"] > 0
+        else f"**Last Week's Attendance Details (Week of {last_week_start_date}):**\nNo attendance recorded last week.\n\n"
+    )
+
+    # Prepare the response
+    response = (
+        f"**Details for {discord_name}:**\n"
+        f"Team: **{user_team}**\n"
+        f"Role: **{user_role}**\n\n"
+        f"{this_week_response}"
+        f"{last_week_response}"
+    )
+
+    # Send the response
+    await ctx.send(response)
+    
+        
 # Run the bot
 bot.run(TOKEN)
