@@ -1,0 +1,42 @@
+{
+    "vod_names": [
+        "interserver1",
+        "GVGBaltic",
+        "Wargames1",
+        "Wargames2"
+    ],
+    "vod_links": {
+        "interserver1": {
+            "KingTetrax": "https://www.youtube.com/watch?v=UWazDqhGOAk"
+        },
+        "GVGBaltic": {
+            "Jaiseck": "https://youtu.be/Cyc3EeatcpM",
+            "MinervaPow": "https://youtu.be/gTC7e8jRMK4",
+            "UlaOdinsdottir": "https://drive.google.com/file/d/1wXne6MZYTFxkUdnFn22jzaRJvHj57PQE/view?usp=drive_link",
+            "Alex2": "https://www.youtube.com/watch?v=sc6rx6XoHQk",
+            "PalaWolf": "https://www.youtube.com/watch?v=kVlfWki8NXU",
+            "lazzed": "https://www.youtube.com/watch?v=2D3YmHbd9HY",
+            "Jake": "https://www.youtube.com/watch?v=hLwfxSad154&ab_channel=FromStateFarm",
+            "mAkik8": "https://www.youtube.com/watch?v=EiAWwhQnvfs",
+            "Mentox": "https://www.youtube.com/watch?v=8KKrt7Nb9MI"
+        },
+        "Wargames1": {
+            "MinervaPow": "https://youtu.be/pQ8F6CvyolI",
+            "Alex2": "https://youtu.be/yPmo9BSYZuI",
+            "Jaiseck": "https://youtu.be/w8ZDvlHzfyk",
+            "Rubie": "https://youtu.be/vILJ2IYMWiE",
+            "lazzed": "https://www.youtube.com/watch?v=dvMqCpS6gYw",
+            "TurboDedek": "https://www.youtube.com/watch?v=0kT4CBUvzXk",
+            "Mentox": "https://www.youtube.com/watch?v=SuaQnH5kp1g"
+        },
+        "Wargames2": {
+            "MinervaPow": "https://youtu.be/eQTjLpYzewo",
+            "Alex2": "https://www.youtube.com/watch?v=AZ98Pm-58TE",
+            "Jaiseck": "https://youtu.be/QL1VjWSxtz8",
+            "VyoS": "https://www.youtube.com/watch?v=ReTt79AHB0w",
+            "Rubie": "https://youtu.be/UuVor7mn9ig",
+            "lazzed": "https://www.youtube.com/watch?v=uN6WIltOyfs&feature=youtu.be",
+            "Mentox": "https://www.youtube.com/watch?v=NX11J588oFs"
+        }
+    }
+}
