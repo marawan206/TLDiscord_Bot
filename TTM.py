@@ -592,6 +592,50 @@ async def details(ctx, discord_name: str):
     # Send the response
     await ctx.send(response)
     
-        
+     
+"""
+NEW SECTIONS
+"""
+
+# Helper functions for VOD management
+def load_vod_data():
+    try:
+        with open("vods.json", "r", encoding="utf-8") as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"vod_names": [], "vod_links": {}}
+
+def save_vod_data(data):
+    with open("vods.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+
+# Command to add a new VOD name (admin only)
+@bot.command(name="addvod")
+@commands.check(is_admin)
+async def add_vod(ctx, *, vod_name: str):
+    vod_data = load_vod_data()
+    
+    # Convert to lowercase for case-insensitive comparison
+    vod_name_lower = vod_name.lower()
+    
+    # Check if VOD name already exists
+    if vod_name_lower in [name.lower() for name in vod_data["vod_names"]]:
+        await ctx.send(f"❌ VOD name '{vod_name}' already exists!")
+        return
+    
+    # Add new VOD name
+    vod_data["vod_names"].append(vod_name)
+    vod_data["vod_links"][vod_name] = {}
+    save_vod_data(vod_data)
+    
+    await ctx.send(f"✅ Added new VOD name: **{vod_name}**")
+
+@add_vod.error
+async def add_vod_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("❌ You don't have permission to use this command.")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Usage: !addvod <vod_name>")
+
 # Run the bot
 bot.run(TOKEN)
