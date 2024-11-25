@@ -637,5 +637,37 @@ async def add_vod_error(ctx, error):
     elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("❌ Usage: !addvod <vod_name>")
 
+# Command for members to add their VOD links
+@bot.command(name="vodlink")
+async def add_vod_link(ctx, vod_name: str, link: str):
+    vod_data = load_vod_data()
+    
+    # Convert to lowercase for case-insensitive comparison
+    vod_name_lower = vod_name.lower()
+    
+    # Find the actual VOD name with correct case
+    actual_vod_name = None
+    for name in vod_data["vod_names"]:
+        if name.lower() == vod_name_lower:
+            actual_vod_name = name
+            break
+    
+    if not actual_vod_name:
+        # List available VOD names if the provided name doesn't exist
+        vod_list = "\n".join(vod_data["vod_names"]) if vod_data["vod_names"] else "No VODs available"
+        await ctx.send(f"❌ Invalid VOD name. Available VODs:\n{vod_list}")
+        return
+    
+    # Validate URL format (basic check)
+    if not link.startswith(('http://', 'https://')):
+        await ctx.send("❌ Invalid link format. Link must start with http:// or https://")
+        return
+    
+    # Add or update the member's VOD link
+    vod_data["vod_links"][actual_vod_name][ctx.author.display_name] = link
+    save_vod_data(vod_data)
+    
+    await ctx.send(f"✅ Added your VOD link for **{actual_vod_name}**")
+
 # Run the bot
 bot.run(TOKEN)
