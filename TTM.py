@@ -668,6 +668,27 @@ async def add_vod_link(ctx, vod_name: str, link: str):
     save_vod_data(vod_data)
     
     await ctx.send(f"✅ Added your VOD link for **{actual_vod_name}**")
+@add_vod_link.error
+async def add_vod_link_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Usage: !vodlink <vod_name> <link>")
+
+# Command to list all VODs and their statistics
+@bot.command(name="listvods")
+async def list_vods(ctx):
+    vod_data = load_vod_data()
+    
+    if not vod_data["vod_names"]:
+        await ctx.send("No VODs available.")
+        return
+    
+    response = "**Available VODs and Submissions:**\n\n"
+    
+    for vod_name in vod_data["vod_names"]:
+        link_count = len(vod_data["vod_links"].get(vod_name, {}))
+        response += f"**{vod_name}** - {link_count} submissions\n"
+    
+    await ctx.send(response)
 
 # Run the bot
 bot.run(TOKEN)
