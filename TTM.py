@@ -689,6 +689,89 @@ async def list_vods(ctx):
         response += f"**{vod_name}** - {link_count} submissions\n"
     
     await ctx.send(response)
+# Command to view detailed VOD information (admin only)
+@bot.command(name="vodinfo")
+@commands.check(is_admin)
+async def vod_info(ctx, *, vod_name: str):
+    vod_data = load_vod_data()
+    
+    # Convert to lowercase for case-insensitive comparison
+    vod_name_lower = vod_name.lower()
+    
+    # Find the actual VOD name with correct case
+    actual_vod_name = None
+    for name in vod_data["vod_names"]:
+        if name.lower() == vod_name_lower:
+            actual_vod_name = name
+            break
+    
+    if not actual_vod_name:
+        await ctx.send(f"❌ VOD name '{vod_name}' not found!")
+        return
+    
+    links = vod_data["vod_links"].get(actual_vod_name, {})
+    
+    if not links:
+        await ctx.send(f"No submissions for **{actual_vod_name}**")
+        return
+    
+    response = f"**VOD Links for {actual_vod_name}:**\n\n"
+    for member, link in links.items():
+        response += f"**{member}**: {link}\n"
+    
+    await ctx.send(response)
+@vod_info.error
+async def vod_info_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send("❌ You don't have permission to use this command.")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Usage: !vodinfo <vod_name>")
+"""
+New section 2
+"""
 
+@bot.command(name="allteams")
+async def all_teams(ctx):
+    try:
+        with open("teams.json", "r", encoding="utf-8") as file:
+            teams_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        await ctx.send("❌ Error loading teams data.")
+        return
+
+    response = "**Current Teams Setup:**\n\n"
+    
+    # Process main teams first
+    for team_name, members in teams_data.items():
+        if team_name == "Fillers":
+            continue
+            
+        response += f"**{team_name}**"
+        if team_name == "Team 7":
+            response += " - BOMBERSSSSS 💣 💥"
+        response += "\n"
+        
+        # Group members by role
+        tanks = []
+        healers = []
+        dps = []
+        
+        for member in members:
+            if member["role"] == "Tank":
+                tanks.append(member["name"])
+            elif member["role"] == "Healer":
+                healers.append(member["name"])
+            elif member["role"] == "Damage Dealer":
+                dps.append(member["name"])
+        
+        # Add roles to response
+        if tanks:
+            response += f"Tank: {', '.join(tanks)}\n"
+        if healers:
+            response += f"Healer: {', '.join(healers)}\n"
+        if dps:
+            response += f"DPS: {', '.join(dps)}\n"
+        
+        response += "\n"  # Add spacing between teams     
 # Run the bot
 bot.run(TOKEN)
