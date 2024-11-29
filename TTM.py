@@ -772,6 +772,34 @@ async def all_teams(ctx):
         if dps:
             response += f"DPS: {', '.join(dps)}\n"
         
-        response += "\n"  # Add spacing between teams     
+        response += "\n"  # Add spacing between teams  
+
+    # Add Fillers section at the end
+    if "Fillers" in teams_data:
+        response += "**Available Fillers:**\n"
+        
+        # Group fillers by role
+        filler_tanks = []
+        filler_healers = []
+        filler_dps = []
+        
+        for member in teams_data["Fillers"]:
+            if member["role"] == "Tank":
+                filler_tanks.append(member["name"])
+            elif member["role"] == "Healer":
+                filler_healers.append(member["name"])
+            elif member["role"] == "Damage Dealer":
+                filler_dps.append(member["name"])
+        
+        # Add filler roles to response
+        if filler_tanks:
+            response += f"Tanks: {', '.join(filler_tanks)}\n"
+        if filler_healers:
+            response += f"Healers: {', '.join(filler_healers)}\n"
+        if filler_dps:
+            response += f"DPS: {', '.join(filler_dps)}\n"
+
+    await ctx.send(response)
+
 # Run the bot
 bot.run(TOKEN)
