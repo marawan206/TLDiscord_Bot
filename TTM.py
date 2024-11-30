@@ -800,6 +800,34 @@ async def all_teams(ctx):
             response += f"DPS: {', '.join(filler_dps)}\n"
 
     await ctx.send(response)
+@bot.command(name="suggest")
+async def suggest_teams(ctx):
+    try:
+        # Load teams data
+        with open("teams.json", "r", encoding="utf-8") as file:
+            teams_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        await ctx.send("❌ Error loading teams data.")
+        return
+
+    # Get voice channel
+    voice_channel = ctx.guild.get_channel(VOICE_CHANNEL_ID)
+    if not voice_channel:
+        await ctx.send("❌ Voice channel not found!")
+        return
+
+    # Get active members in voice channel
+    active_members = [member.display_name for member in voice_channel.members]
+    if not active_members:
+        await ctx.send("❌ No members found in voice channel!")
+        return
+
+    response = "**Team Analysis and Suggestions:**\n\n"
+    available_fillers = {
+        "Tank": [],
+        "Healer": [],
+        "Damage Dealer": []
+    }
 
 # Run the bot
 bot.run(TOKEN)
