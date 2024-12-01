@@ -828,6 +828,26 @@ async def suggest_teams(ctx):
         "Healer": [],
         "Damage Dealer": []
     }
+    # Collect available fillers from voice channel
+    for member in teams_data["Fillers"]:
+        if member["name"] in active_members:
+            available_fillers[member["role"]].append(member["name"])
+
+    # Analyze each main team
+    new_team_members = []  # Store leftover fillers for potential new team
+    
+    for team_name, team_members in teams_data.items():
+        if team_name == "Fillers" or team_name == "Team 7":  # Skip Fillers and Team 7
+            continue
+
+        active_team_members = [m for m in team_members if m["name"] in active_members]
+        
+        # Count roles in active team members
+        role_count = {
+            "Tank": sum(1 for m in active_team_members if m["role"] == "Tank"),
+            "Healer": sum(1 for m in active_team_members if m["role"] == "Healer"),
+            "Damage Dealer": sum(1 for m in active_team_members if m["role"] == "Damage Dealer")
+        }
 
 # Run the bot
 bot.run(TOKEN)
