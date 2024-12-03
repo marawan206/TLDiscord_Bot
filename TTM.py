@@ -848,6 +848,21 @@ async def suggest_teams(ctx):
             "Healer": sum(1 for m in active_team_members if m["role"] == "Healer"),
             "Damage Dealer": sum(1 for m in active_team_members if m["role"] == "Damage Dealer")
         }
+        # Check if team needs members
+        if len(active_team_members) < 6:
+            response += f"**{team_name}** needs:\n"
+            
+            # Check missing roles
+            if role_count["Tank"] < 1:
+                response += f"- Tank (Suggestions: {', '.join(available_fillers['Tank']) or 'None'})\n"
+            if role_count["Healer"] < 1:
+                response += f"- Healer (Suggestions: {', '.join(available_fillers['Healer']) or 'None'})\n"
+            if role_count["Damage Dealer"] < 4:
+                needed_dps = 4 - role_count["Damage Dealer"]
+                response += f"- {needed_dps} DPS (Suggestions: {', '.join(available_fillers['Damage Dealer'][:needed_dps]) or 'None'})\n"
+            
+            response += "\n"
+
 
 # Run the bot
 bot.run(TOKEN)
