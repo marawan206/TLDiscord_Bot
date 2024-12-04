@@ -114,6 +114,7 @@ def append_to_schedule(events):
     except Exception as e:
         print(f"Error updating schedule.json: {e}")
 
+
 # Helper Function: Process message with Groq API
 def process_with_groq(message_content):
     try:
@@ -178,7 +179,6 @@ def is_admin(ctx):
     admin_role = discord.utils.get(ctx.guild.roles, id=ADMIN_ROLE_ID)
     higher_admin_role = discord.utils.get(ctx.guild.roles, id=HIGHER_ADMIN_ROLE_ID)
     return admin_role in ctx.author.roles or higher_admin_role in ctx.author.roles
-
 
 # Command: Show Commands List
 @bot.command(name="commands")
@@ -358,6 +358,8 @@ async def today(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error fetching today's events: {e}")
 
+        
+# Command: Show My Team
 # Command: Show My Team
 @bot.command(name="myteam")
 async def myteam(ctx):
@@ -390,8 +392,6 @@ async def myteam(ctx):
         response += "\n**BOMBER GROUP** 💣"
 
     await ctx.send(response)
-
-   
     
 # Command: Check personal attendance
 @bot.command(name="myatt")
@@ -474,7 +474,6 @@ async def my_attendance(ctx):
 
     # Send the response
     await ctx.send(response)
-
     
 @bot.command(name="details")
 @commands.has_permissions(administrator=True)
@@ -592,7 +591,8 @@ async def details(ctx, discord_name: str):
     # Send the response
     await ctx.send(response)
     
-     
+    
+    
 """
 NEW SECTIONS
 """
@@ -668,6 +668,7 @@ async def add_vod_link(ctx, vod_name: str, link: str):
     save_vod_data(vod_data)
     
     await ctx.send(f"✅ Added your VOD link for **{actual_vod_name}**")
+
 @add_vod_link.error
 async def add_vod_link_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -689,6 +690,7 @@ async def list_vods(ctx):
         response += f"**{vod_name}** - {link_count} submissions\n"
     
     await ctx.send(response)
+
 # Command to view detailed VOD information (admin only)
 @bot.command(name="vodinfo")
 @commands.check(is_admin)
@@ -720,12 +722,14 @@ async def vod_info(ctx, *, vod_name: str):
         response += f"**{member}**: {link}\n"
     
     await ctx.send(response)
+
 @vod_info.error
 async def vod_info_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
         await ctx.send("❌ You don't have permission to use this command.")
     elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("❌ Usage: !vodinfo <vod_name>")
+        
 """
 New section 2
 """
@@ -772,7 +776,7 @@ async def all_teams(ctx):
         if dps:
             response += f"DPS: {', '.join(dps)}\n"
         
-        response += "\n"  # Add spacing between teams  
+        response += "\n"  # Add spacing between teams
 
     # Add Fillers section at the end
     if "Fillers" in teams_data:
@@ -800,6 +804,7 @@ async def all_teams(ctx):
             response += f"DPS: {', '.join(filler_dps)}\n"
 
     await ctx.send(response)
+
 @bot.command(name="suggest")
 async def suggest_teams(ctx):
     try:
@@ -828,6 +833,7 @@ async def suggest_teams(ctx):
         "Healer": [],
         "Damage Dealer": []
     }
+
     # Collect available fillers from voice channel
     for member in teams_data["Fillers"]:
         if member["name"] in active_members:
@@ -848,6 +854,7 @@ async def suggest_teams(ctx):
             "Healer": sum(1 for m in active_team_members if m["role"] == "Healer"),
             "Damage Dealer": sum(1 for m in active_team_members if m["role"] == "Damage Dealer")
         }
+
         # Check if team needs members
         if len(active_team_members) < 6:
             response += f"**{team_name}** needs:\n"
@@ -863,6 +870,26 @@ async def suggest_teams(ctx):
             
             response += "\n"
 
+    # Check if we can form a new team from remaining fillers
+    remaining_fillers = {
+        "Tank": [m for m in available_fillers["Tank"] if m not in new_team_members],
+        "Healer": [m for m in available_fillers["Healer"] if m not in new_team_members],
+        "Damage Dealer": [m for m in available_fillers["Damage Dealer"] if m not in new_team_members]
+    }
 
+    if (len(remaining_fillers["Tank"]) >= 1 and 
+        len(remaining_fillers["Healer"]) >= 1 and 
+        len(remaining_fillers["Damage Dealer"]) >= 4):
+        
+        response += "**Possible New Team from Remaining Fillers:**\n"
+        response += f"Tank: {remaining_fillers['Tank'][0]}\n"
+        response += f"Healer: {remaining_fillers['Healer'][0]}\n"
+        response += f"DPS: {', '.join(remaining_fillers['Damage Dealer'][:4])}\n"
+
+    if response == "**Team Analysis and Suggestions:**\n\n":
+        response += "All teams are properly filled! ✅"
+
+    await ctx.send(response)
+    
 # Run the bot
 bot.run(TOKEN)
