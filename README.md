@@ -1,164 +1,87 @@
-# Throne and Liberty Discord Bot
+# TTM Discord Bot
 
-A comprehensive Discord bot for managing Throne and Liberty (TL) gaming community, featuring enhanced attendance tracking, event management, and team organization capabilities.
+## This bot was originally made for Trauma420 (Throne and Liberty)
+
+## Overview
+TTM is a Discord bot designed to assist with team management, event scheduling, attendance tracking, and VOD submissions for a gaming community. It integrates with the Groq API for event extraction and provides various administrative and user commands.
 
 ## Features
+- **Team Management:** View team assignments, roles, and available fillers.
+- **Event Scheduling:** Automatically extract events from messages and maintain a schedule.
+- **Attendance Tracking:** Record attendance from voice channels and provide statistics.
+- **VOD Management:** Submit and retrieve VOD links for review.
+- **Admin Controls:** Manage events, attendance, and team assignments with admin commands.
 
-### Event Management
-- **Automatic Event Detection**
-  - Monitors specific channels for event announcements
-  - Uses Groq AI to extract event details automatically
-  - Supports manual event addition by administrators
-
-### Attendance System
-- **Advanced Attendance Tracking**
-  - Automatic voice channel attendance monitoring
-  - Persistent attendance records stored in JSON format
-  - Historical attendance data tracking
-  - Team completion status checking
-
-### Team Management
-- **Comprehensive Team Organization**
-  - Role-based team structure (Healers, Damage Dealers, Tanks)
-  - Team composition tracking
-  - Special team designations (e.g., "Bombers" team)
-  - Individual team member status
-
-### User Information
-- **Detailed Member Tracking**
-  - Role and team lookup
-  - Special user recognitions
-  - Team assignment verification
-  - Current status checking
-
-## Prerequisites
-
+## Requirements
 - Python 3.8+
-- Required Python packages:
-  ```
-  discord.py
-  pytz
-  groq
-  ```
-- Discord Bot Token
-- Groq API Key
-
-## Configuration Files
-
-### config.json
-```json
-{
-    "TOKEN": "your-discord-bot-token",
-    "GROQ_API_KEY": "your-groq-api-key",
-    "CHANNEL_IDS": {
-        "TEXT": "your-text-channel-id",
-        "VOICE": "your-voice-channel-id",
-        "WATCHED": "your-watched-channel-id"
-    },
-    "ROLE_IDS": {
-        "ADMIN": "your-admin-role-id",
-        "HIGHER_ADMIN": "your-higher-admin-role-id",
-        "MEMBER": "your-member-role-id"
-    }
-}
-```
-
-### teams.json
-```json
-{
-    "Team1": [
-        {"name": "Player1", "role": "Healer"},
-        {"name": "Player2", "role": "Tank"}
-    ],
-    "Bombers": [
-        {"name": "Player3", "role": "Damage Dealer"},
-        {"name": "Player4", "role": "Healer"}
-    ]
-}
-```
-
-## Commands
-
-### General Commands
-- `!commands` - Display all available commands
-- `!today` - Show today's scheduled events
-- `!whois <username>` - Look up user information
-
-### Team Commands
-- `!myteam` - View your team's information and members
-
-### Admin Commands
-- `!attendance` - Record and display attendance (Admin only)
-- `!add <name> <time> [description]` - Add new events (Admin only)
-
-## File Structure
-```
-├── bot.py
-├── config.json
-├── teams.json
-├── schedule.json
-├── attendance.json
-└── README.md
-```
-
-## New Features and Updates
-
-### Attendance System
-- Enhanced attendance tracking with persistent storage
-- Historical attendance records
-- Automatic voice channel monitoring
-- Team completion checking
-
-### Event Management
-- AI-powered event extraction using Groq
-- Automatic event scheduling from announcements
-- Manual event addition capability
-
-### Special Features
-- Special recognition for specific users/roles
-- Team-specific messages (e.g., Bomber Group designation)
-- Timezone support (CET)
+- Discord API
+- Groq API
+- Required Python Libraries:
+  - `discord.py`
+  - `json`
+  - `pytz`
+  - `re`
+  - `os`
+  - `datetime`
 
 ## Installation
-
-1. Clone the repository:
-```bash
-git clone [repository-url]
-```
-
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/marawan206/TLDiscord_Bot
+   cd TTM
+   ```
 2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Set up configuration files:
-   - Create `config.json` with your credentials
-   - Set up `teams.json` with your team structure
-   - Ensure proper permissions for JSON files
-
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Configure the bot:
+   - Set your **Discord Bot Token** and **Groq API Key** in `TTM.py`
+   - Specify **Role IDs, Channel IDs, and User IDs** where needed.
 4. Run the bot:
-```bash
-python bot.py
-```
+   ```bash
+   python TTM.py
+   ```
 
-## Security Notes
+## Usage
+### General Commands
+- `!commands` - Show available commands.
+- `!whois <username>` - Display a user’s role and team.
+- `!myteam` - View your assigned team members.
+- `!myatt` - Check your attendance statistics.
+- `!today` - Display today’s scheduled events.
+- `!allteams` - List all teams and their members.
+- `!suggest` - Suggest team fillers based on voice channel activity.
 
-- Store sensitive credentials in config.json (not in code)
-- Implement proper role-based access control
-- Regular credential rotation
-- Backup attendance and schedule data
+### Admin Commands
+- `!attendance <event_name>` - Record attendance from the voice channel.
+- `!add <name> <time> [description]` - Add an event to the schedule.
+- `!details <username>` - Show detailed attendance for a user.
+
+### VOD Commands
+- `!vodlink <vod_name> <link>` - Submit a VOD link.
+- `!listvods` - List all available VODs and their submission counts.
+- `!addvod <vod_name>` - Add a new VOD category (Admin only).
+- `!vodinfo <vod_name>` - Display all submissions for a VOD (Admin only).
+
+## Configuration
+The bot requires manual configuration in `TTM.py`. Update the following placeholders:
+- `TOKEN = "your-discord-bot-token"`
+- `GROQ_API_KEY = "your-groq-api-key"`
+- Replace `<SPECIFY IF NEEDED>` with actual Role IDs, Channel IDs, and User IDs.
+
+## File Structure
+- `TTM.py` - The main bot script.
+- `teams.json` - Stores team assignments and roles.
+- `attendance.json` - Tracks attendance records.
+- `schedule.json` - Maintains scheduled events.
+- `vods.json` - Stores VOD submissions and categories.
 
 ## Contributing
+Pull requests are welcome. Please ensure that your contributions align with the existing coding style and functionality.
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+## License
+This project is licensed under the MIT License.
 
-## Support
+## Contact
+For questions or issues, contact the project maintainers on Discord.
 
-For support, please:
-1. Check the existing documentation
-2. Contact server administrators
-3. Create an issue in the repository
