@@ -67,15 +67,57 @@ async def show_menu(ctx):
 async def on_interaction(interaction: discord.Interaction):
     if interaction.data["custom_id"] == "today_events":
         await interaction.response.send_message("Fetching today's events...", ephemeral=True)
-        await today(interaction)
+        await show_todays_events(interaction)
     elif interaction.data["custom_id"] == "my_team":
         await interaction.response.send_message("Fetching your team info...", ephemeral=True)
-        await myteam(interaction)
+        await show_my_team(interaction)
     elif interaction.data["custom_id"] == "attendance":
         await interaction.response.send_message("Checking attendance...", ephemeral=True)
-        await attendance(interaction)
+        await check_attendance(interaction)
     elif interaction.data["custom_id"] == "vods":
         await interaction.response.send_message("Listing VODs...", ephemeral=True)
         await list_vods(interaction)
+
+# Show Today's Events
+async def show_todays_events(interaction: discord.Interaction):
+    try:
+        with open("schedule.json", "r") as file:
+            schedule = json.load(file)
+        today_date = datetime.now(pytz.timezone("CET")).strftime("%Y-%m-%d")
+        if today_date not in schedule:
+            await interaction.response.send_message("No events scheduled for today.", ephemeral=True)
+            return
+        response = "**Today's Events (CET):**\n"
+        for event in schedule[today_date]:
+            response += f"- **{event['name']}**: {event['time']} | {event['description']}\n"
+        await interaction.response.send_message(response, ephemeral=True)
+    except Exception as e:
+        await interaction.response.send_message(f"Error fetching today's events: {e}", ephemeral=True)
+
+# Show My Team
+async def show_my_team(interaction: discord.Interaction):
+    user_name = interaction.user.display_name
+    user_team = next((team for team, members in teams.items() if any(m["name"].lower() == user_name.lower() for m in members)), None)
+    if not user_team:
+        await interaction.response.send_message("You are not assigned to any team.", ephemeral=True)
+        return
+    team_members = [m["name"] for m in teams[user_team]]
+    response = f"**Your Team:** {user_team}\n**Members:** {', '.join(team_members)}"
+    await interaction.response.send_message(response, ephemeral=True)
+
+# Check Attendance
+async def check_attendance(interaction: discord.Interaction):
+    user_name = interaction.user.display_name
+    attended_events = [
+        f"{event['name']} at {event['time']}"
+        for day, events in attendance_data.items()
+        for event in events.values()
+        if user_name in event["attendees"]
+    ]
+    if not attended_events:
+        await interaction.response.send_message("You have no attendance records.", ephemeral=True)
+    else:
+        response = "**Your Attendance Record:**\n" + "\n".join(attended_events)
+        await interaction.response.send_message(response, ephemeral=True)
 
 bot.run(TOKEN)
