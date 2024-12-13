@@ -119,5 +119,45 @@ async def check_attendance(interaction: discord.Interaction):
     else:
         response = "**Your Attendance Record:**\n" + "\n".join(attended_events)
         await interaction.response.send_message(response, ephemeral=True)
+class VODMenu(View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(Button(label="Submit VOD", style=discord.ButtonStyle.primary, custom_id="submit_vod"))
+        self.add_item(Button(label="List VODs", style=discord.ButtonStyle.secondary, custom_id="list_vods"))
+        self.add_item(Button(label="VOD Info", style=discord.ButtonStyle.success, custom_id="vod_info"))
+
+@bot.command(name="vodmenu")
+async def show_vod_menu(ctx):
+    view = VODMenu()
+    await ctx.send("Manage VODs using the buttons below:", view=view)
+@bot.event
+async def on_interaction(interaction: discord.Interaction):
+    if interaction.data["custom_id"] == "submit_vod":
+        await interaction.response.send_message("Please enter the VOD name and link in the format: `vod_name, link`", ephemeral=True)
+
+        def check(m):
+            return m.author == interaction.user and m.channel == interaction.channel
+        
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=30)
+            vod_name, vod_link = msg.content.split(", ", 1)
+            save_vod_submission(vod_name, vod_link, interaction.user.display_name)
+            await interaction.followup.send(f"✅ VOD `{vod_name}` submitted successfully!", ephemeral=True)
+        except Exception:
+            await interaction.followup.send("❌ Invalid format. Use `vod_name, link`", ephemeral=True)
+
+    elif interaction.data["custom_id"] == "list_vods":
+        vod_list = load_vod_list()
+        await interaction.response.send_message(f"📜 **Available VODs:**\n{vod_list}", ephemeral=True)
+
+    elif interaction.data["custom_id"] == "vod_info":
+        await interaction.response.send_message("Enter the VOD name:", ephemeral=True)
+
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=30)
+            vod_info = get_vod_info(msg.content)
+            await interaction.followup.send(vod_info, ephemeral=True)
+        except Exception:
+            await interaction.followup.send("❌ VOD not found.", ephemeral=True)
 
 bot.run(TOKEN)
