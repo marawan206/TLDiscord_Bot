@@ -224,5 +224,16 @@ async def on_interaction(interaction: discord.Interaction):
             await interaction.followup.send(response, ephemeral=True)
         except Exception:
             await interaction.followup.send("❌ Invalid input.", ephemeral=True)
+# Load VOD data
+def load_vod_data():
+    try:
+        with open("vods.json", "r", encoding="utf-8") as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"vod_names": [], "vod_links": {}}
 
+# Save VOD data
+def save_vod_data(data):
+    with open("vods.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
 bot.run(TOKEN)
