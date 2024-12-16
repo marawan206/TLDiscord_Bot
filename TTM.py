@@ -236,4 +236,6 @@ def load_vod_data():
 def save_vod_data(data):
     with open("vods.json", "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4)
+
+# Handle VOD Button Interactions
 bot.run(TOKEN)
