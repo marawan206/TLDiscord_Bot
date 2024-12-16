@@ -238,4 +238,55 @@ def save_vod_data(data):
         json.dump(data, file, indent=4)
 
 # Handle VOD Button Interactions
+@bot.event
+async def on_interaction(interaction: discord.Interaction):
+    if interaction.data["custom_id"] == "submit_vod":
+        await interaction.response.send_message("Please enter the VOD name and link in the format: `vod_name, link`", ephemeral=True)
+
+        def check(m):
+            return m.author == interaction.user and m.channel == interaction.channel
+        
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=30)
+            vod_name, vod_link = msg.content.split(", ", 1)
+            
+            vod_data = load_vod_data()
+            if vod_name not in vod_data["vod_links"]:
+                vod_data["vod_links"][vod_name] = {}
+            vod_data["vod_links"][vod_name][interaction.user.display_name] = vod_link
+            save_vod_data(vod_data)
+
+            await interaction.followup.send(f"✅ VOD `{vod_name}` submitted successfully!", ephemeral=True)
+        except Exception:
+            await interaction.followup.send("❌ Invalid format. Use `vod_name, link`", ephemeral=True)
+
+    elif interaction.data["custom_id"] == "list_vods":
+        vod_data = load_vod_data()
+        if not vod_data["vod_names"]:
+            await interaction.response.send_message("No VODs available.", ephemeral=True)
+            return
+        
+        response = "**Available VODs:**\n" + "\n".join(vod_data["vod_names"])
+        await interaction.response.send_message(response, ephemeral=True)
+
+    elif interaction.data["custom_id"] == "vod_info":
+        await interaction.response.send_message("Enter the VOD name to view details:", ephemeral=True)
+
+        def check(m):
+            return m.author == interaction.user and m.channel == interaction.channel
+
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=30)
+            vod_name = msg.content
+
+            vod_data = load_vod_data()
+            if vod_name not in vod_data["vod_links"]:
+                await interaction.followup.send("❌ VOD not found.", ephemeral=True)
+                return
+
+            vod_links = vod_data["vod_links"][vod_name]
+            response = f"**VOD Links for {vod_name}:**\n" + "\n".join([f"{user}: {link}" for user, link in vod_links.items()])
+            await interaction.followup.send(response, ephemeral=True)
+        except Exception:
+            await interaction.followup.send("❌ Invalid input.", ephemeral=True)
 bot.run(TOKEN)
