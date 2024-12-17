@@ -289,4 +289,24 @@ async def on_interaction(interaction: discord.Interaction):
             await interaction.followup.send(response, ephemeral=True)
         except Exception:
             await interaction.followup.send("❌ Invalid input.", ephemeral=True)
+class AttendanceMenu(View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(Button(label="Record Attendance", style=discord.ButtonStyle.primary, custom_id="record_attendance"))
+        self.add_item(Button(label="View Attendance", style=discord.ButtonStyle.secondary, custom_id="view_attendance"))
+
+@bot.command(name="attendancemenu")
+async def show_attendance_menu(ctx):
+    view = AttendanceMenu()
+    await ctx.send("Manage attendance using the buttons below:", view=view)
+
+@bot.event
+async def on_interaction(interaction: discord.Interaction):
+    if interaction.data["custom_id"] == "record_attendance":
+        await interaction.response.send_message("Recording attendance...", ephemeral=True)
+        await record_attendance(interaction)
+
+    elif interaction.data["custom_id"] == "view_attendance":
+        await interaction.response.send_message("Fetching attendance records...", ephemeral=True)
+        await view_attendance(interaction)
 bot.run(TOKEN)
