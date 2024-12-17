@@ -309,4 +309,45 @@ async def on_interaction(interaction: discord.Interaction):
     elif interaction.data["custom_id"] == "view_attendance":
         await interaction.response.send_message("Fetching attendance records...", ephemeral=True)
         await view_attendance(interaction)
+async def record_attendance(interaction: discord.Interaction):
+    guild = interaction.guild
+    voice_channel = guild.get_channel(VOICE_CHANNEL_ID)
+
+    if not voice_channel:
+        await interaction.response.send_message("❌ Voice channel not found! Check the channel ID.", ephemeral=True)
+        return
+
+    attendees = sorted([member.display_name for member in voice_channel.members])
+    if not attendees:
+        await interaction.response.send_message("❌ No attendees found in the voice channel.", ephemeral=True)
+        return
+
+    today = datetime.now().date().isoformat()
+    if today not in attendance_data:
+        attendance_data[today] = {}
+
+    event_name = "General Attendance"
+    attendance_data[today][event_name] = {
+        "time": datetime.now().strftime("%H:%M"),
+        "attendees": attendees
+    }
+
+    with open("attendance.json", "w", encoding="utf-8") as file:
+        json.dump(attendance_data, file, indent=4, ensure_ascii=False)
+
+    await interaction.response.send_message(f"✅ Attendance recorded for {len(attendees)} attendees.", ephemeral=True)
+
+async def view_attendance(interaction: discord.Interaction):
+    user_name = interaction.user.display_name
+    attended_events = [
+        f"{event['name']} at {event['time']}"
+        for day, events in attendance_data.items()
+        for event in events.values()
+        if user_name in event["attendees"]
+    ]
+    if not attended_events:
+        await interaction.response.send_message("You have no attendance records.", ephemeral=True)
+    else:
+        response = "**Your Attendance Record:**\n" + "\n".join(attended_events)
+        await interaction.response.send_message(response, ephemeral=True)
 bot.run(TOKEN)
