@@ -350,4 +350,15 @@ async def view_attendance(interaction: discord.Interaction):
     else:
         response = "**Your Attendance Record:**\n" + "\n".join(attended_events)
         await interaction.response.send_message(response, ephemeral=True)
+class TeamMenu(View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(Button(label="Who is?", style=discord.ButtonStyle.primary, custom_id="whois"))
+        self.add_item(Button(label="All Teams", style=discord.ButtonStyle.secondary, custom_id="all_teams"))
+        self.add_item(Button(label="Suggest Fillers", style=discord.ButtonStyle.success, custom_id="suggest_fillers"))
+
+@bot.command(name="teammenu")
+async def show_team_menu(ctx):
+    view = TeamMenu()
+    await ctx.send("Manage teams using the buttons below:", view=view)
 bot.run(TOKEN)
