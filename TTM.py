@@ -361,4 +361,26 @@ class TeamMenu(View):
 async def show_team_menu(ctx):
     view = TeamMenu()
     await ctx.send("Manage teams using the buttons below:", view=view)
+
+@bot.event
+async def on_interaction(interaction: discord.Interaction):
+    if interaction.data["custom_id"] == "whois":
+        await interaction.response.send_message("Enter the username to look up:", ephemeral=True)
+
+        def check(m):
+            return m.author == interaction.user and m.channel == interaction.channel
+
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=30)
+            username = msg.content
+            await whois(interaction, username)
+        except Exception:
+            await interaction.followup.send("❌ Invalid input.", ephemeral=True)
+
+    elif interaction.data["custom_id"] == "all_teams":
+        await show_all_teams(interaction)
+
+    elif interaction.data["custom_id"] == "suggest_fillers":
+        await suggest_fillers(interaction)
+
 bot.run(TOKEN)
