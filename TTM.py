@@ -382,5 +382,32 @@ async def on_interaction(interaction: discord.Interaction):
 
     elif interaction.data["custom_id"] == "suggest_fillers":
         await suggest_fillers(interaction)
+async def whois(interaction: discord.Interaction, username: str):
+    user_team = next(
+        (team for team, members in teams.items() if any(m["name"].lower() == username.lower() for m in members)), None
+    )
+    if not user_team:
+        await interaction.followup.send(f"❌ No team found for {username}.", ephemeral=True)
+        return
 
+    user_role = next(
+        (m["role"] for team, members in teams.items() for m in members if m["name"].lower() == username.lower()), "Unknown"
+    )
+    await interaction.followup.send(f"**{username}** is a **{user_role}** in **{user_team}**.", ephemeral=True)
+
+async def show_all_teams(interaction: discord.Interaction):
+    response = "**Current Teams Setup:**\n\n"
+    for team_name, members in teams.items():
+        response += f"**{team_name}**\n"
+        response += ", ".join(m["name"] for m in members) + "\n\n"
+    await interaction.response.send_message(response, ephemeral=True)
+
+async def suggest_fillers(interaction: discord.Interaction):
+    fillers = teams.get("Fillers", [])
+    if not fillers:
+        await interaction.response.send_message("No fillers available.", ephemeral=True)
+        return
+
+    response = "**Available Fillers:**\n" + "\n".join(f"{m['name']} ({m['role']})" for m in fillers)
+    await interaction.response.send_message(response, ephemeral=True)
 bot.run(TOKEN)
