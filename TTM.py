@@ -283,6 +283,31 @@ async def whois(ctx, *, nickname: str = None):
         await ctx.send(f"❌ No information found for **{search_name}**.")
 
 
+# Command: Show Today's Events
+@bot.command(name="today")
+async def today(ctx):
+    try:
+        # Load schedule from file
+        with open("schedule.json", "r") as file:
+            schedule = json.load(file)
+
+        # Define today's date in CET
+        cet = pytz.timezone("CET")
+        today_date = datetime.now(cet).strftime("%Y-%m-%d")
+
+        if today_date not in schedule or not schedule[today_date]:
+            await ctx.send("✅ No events scheduled for today.")
+            return
+
+        # Build the response message
+        response = "**Today's Events (CET):**\n"
+        for event in schedule[today_date]:
+            response += f"- **{event['name']}**: {event['time']} | {event['description']}\n"
+
+        await ctx.send(response)
+    except Exception as e:
+        await ctx.send(f"❌ Error fetching today's events: {e}")
+
 # Command: Show My Team
 @bot.command(name="myteam")
 async def myteam(ctx):
