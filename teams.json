@@ -1,0 +1,10 @@
+{
+    "Team1": [
+        {"name": "Player1", "role": "Healer"},
+        {"name": "Player2", "role": "Tank"}
+    ],
+    "Team2": [
+        {"name": "Player3", "role": "Damage Dealer"},
+        {"name": "Player4", "role": "Healer"}
+    ]
+}
