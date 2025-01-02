@@ -1,5 +1,147 @@
 {
-    "YYYY-MM-DD": [
-        {}
+    "2024-12-18": [
+        {
+            "name": "Tevent",
+            "time": "18:00",
+            "description": "Conflict Archboss | Tevent"
+        },
+        {
+            "name": "Event",
+            "time": "22:00",
+            "description": "Hidden Brown Mica Event"
+        },
+        {
+            "name": "PVP Event",
+            "time": "21:00",
+            "description": "Destination: Chernobog"
+        }
+    ],
+    "2024-12-21": [
+        {
+            "name": "Join our new Alliance Discord",
+            "time": "",
+            "description": "Ragequit: https://discord.gg/B3Tu4jMVrF"
+        },
+        {
+            "name": "Little Teaser for 2morrow Evening",
+            "time": "(Time - TBD)",
+            "description": "Fight Against the Guild Purge"
+        },
+        {
+            "name": "Guild Event",
+            "time": "19:00",
+            "description": "Dark Destroyer Guild Event"
+        },
+        {
+            "name": "Morokai Riftsone",
+            "time": "After Guild Event",
+            "description": "Killing Morokai"
+        },
+        {
+            "name": "Guild Bosses",
+            "time": "After Morokai",
+            "description": "Go to our guild base"
+        },
+        {
+            "name": "Riftstone Fight",
+            "time": "21:00",
+            "description": "Fight against Silver Doom"
+        },
+        {
+            "name": "Inter-server Fight",
+            "time": "21:30",
+            "description": "FREE LUCENT!"
+        },
+        {
+            "name": "Guild Event 2",
+            "time": "22:00",
+            "description": "Talisman Delivery"
+        }
+    ],
+    "2024-12-22": [
+        {
+            "name": "Conflict Bosses",
+            "time": "20:00",
+            "description": "To be announced"
+        },
+        {
+            "name": "Riftstone",
+            "time": "20:30",
+            "description": "Morokai Riftstone"
+        },
+        {
+            "name": "War games",
+            "time": "21:00",
+            "description": "Against Throne Holding Guild Purge!"
+        },
+        {
+            "name": "Complaint about Loot System",
+            "time": "",
+            "description": "Recently more complaints about the loot system, which has been in use for 2 months without issues previously reported."
+        },
+        {
+            "name": "System Overhaul",
+            "time": "",
+            "description": "Overwork on the system as requested by some users"
+        },
+        {
+            "name": "Status Quo",
+            "time": "",
+            "description": "Leave the system as it is, as some users are fine with the current setup"
+        }
+    ],
+    "2024-12-27": [
+        {
+            "name": "Inter-server",
+            "time": "21:30",
+            "description": "Inter-server fight on our Boonstone"
+        },
+        {
+            "name": "PVP",
+            "time": "22:00",
+            "description": "PVP Guild Event"
+        }
+    ],
+    "2024-12-28": [
+        {
+            "name": "Creating a Discord for Wargames",
+            "time": "",
+            "description": "with a Bunch of Great Guilds for Competition :white_check_mark:"
+        },
+        {
+            "name": "Queen Bellandir",
+            "time": "18:00",
+            "description": "Open World Conflict Boss Quen Belandir :white_check_mark: "
+        },
+        {
+            "name": "Guild Event",
+            "time": "19:00",
+            "description": "Guild Event Stop the Mana Frenz (Upcoming)"
+        },
+        {
+            "name": "Queen Bellandir Peace",
+            "time": "20:00",
+            "description": "Open World Bosses Queen Bellandir Peace then Conflict"
+        },
+        {
+            "name": "GVG",
+            "time": "21:00",
+            "description": "VS Lus Costodes on our Morokai Riftstoen"
+        },
+        {
+            "name": "GVG 2",
+            "time": "22:00",
+            "description": "Interserver Fight Stop the Mana Frenzy"
+        },
+        {
+            "name": "PVP",
+            "time": "23:00",
+            "description": "Conflict Bosses"
+        },
+        {
+            "name": "Reminder to use Teamspeak",
+            "time": "",
+            "description": "Start getting into the TeamSpeak im gonna Track this more often the only Way that ppl get better in Playing with each other is 2 get yourself into the TeamSpeak"
+        }
     ]
 }

@@ -1,10 +1,83 @@
 {
-    "Team1": [
-        {"name": "Player1", "role": "Healer"},
-        {"name": "Player2", "role": "Tank"}
+    "Team 1": [
+        {"name": "Alatrise", "role": "Tank"},
+        {"name": "✝ HENNACEE ✝", "role": "Damage Dealer"},
+        {"name": "Skiss", "role": "Damage Dealer"},
+        {"name": "Sonnenrabe", "role": "Damage Dealer"},
+        {"name": "lazzed", "role": "Damage Dealer"},
+        {"name": "LordOlethron", "role": "Healer"}     
     ],
-    "Team2": [
-        {"name": "Player3", "role": "Damage Dealer"},
-        {"name": "Player4", "role": "Healer"}
+    "Team 2": [
+        {"name": "Flieder", "role": "Tank"},
+        {"name": "TomZn", "role": "Healer"},
+        {"name": "Phow[David]", "role": "Damage Dealer"},
+        {"name": "TurboDedek", "role": "Damage Dealer"},
+        {"name": "Latama", "role": "Tank"},
+        {"name": "Mentox", "role": "Damage Dealer"}
+    ],
+    "Team 3": [
+        {"name": "ジャーモ(Jarmo)", "role": "Tank"},
+        {"name": "Kaputzinski", "role": "Damage Dealer"},
+        {"name": "Coltainne", "role": "Damage Dealer"},
+        {"name": "EviL RoboT (BVB)", "role": "Damage Dealer"},
+        {"name": "Jezzmine", "role": "Damage Dealer"},
+        {"name": "ɆVłⱠĐɆ₮Ɇ", "role": "Damage Dealer"}
+    ],
+    "Team 4": [
+        {"name": "Tzugumi", "role": "Tank"},
+        {"name": "OldManScalin", "role": "Healer"},     
+        {"name": "Alex2", "role": "Damage Dealer"},
+        {"name": "cuppy", "role": "Damage Dealer"},
+        {"name": "VyoS", "role": "Damage Dealer"},
+        {"name": "Benfer461", "role": "Damage Dealer"}
+    ],
+    "Team 5": [
+        {"name": "Blakviper", "role": "Tank"},
+        {"name": "MinervaPow", "role": "Damage Dealer"},
+        {"name": "Louveko", "role": "Damage Dealer"},
+        {"name": "Halfingard", "role": "Damage Dealer"},
+        {"name": "Sodasad", "role": "Healer"},
+        {"name": "Jaiseck", "role": "Healer"}
+    ],
+    "Team 6": [
+        {"name": "mAkik8", "role": "Tank"},
+        {"name": "Greensyndrom", "role": "Healer"},
+        {"name": "Xendrix", "role": "Damage Dealer"},
+        {"name": "XbigBaguette", "role": "Damage Dealer"},
+        {"name": "FIRIKAN", "role": "Damage Dealer"},
+        {"name": "John66", "role": "Damage Dealer"}
+    ],
+    "Team 7": [
+        {"name": "LordXNgo", "role": "Healer"},
+        {"name": "DepressoDude", "role": "Damage Dealer"},
+        {"name": "Sentomaru", "role": "Damage Dealer"},
+        {"name": "TreyyG", "role": "Damage Dealer"},
+        {"name": "Jake", "role": "Damage Dealer"},
+        {"name": "Blaze", "role": "Tank"}
+    ],
+    "Team 8": [
+        {"name": "L3VI", "role": "Damage Dealer"},
+        {"name": "KingTetrax", "role": "Damage Dealer"},
+        {"name": "Rubie", "role": "Damage Dealer"},
+        {"name": "PalaWolf", "role": "Damage Dealer"},
+        {"name": "Zelieth", "role": "Damage Dealer"},
+        {"name": "Barbalito", "role": "Damage Dealer"}
+    ],
+    "Team 9": [
+        {"name": "SubZ3r0", "role": "Damage Dealer"},
+        {"name": "JstSanj", "role": "Damage Dealer"},
+        {"name": "Klunker7", "role": "Damage Dealer"},
+        {"name": "Block", "role": "Tank"},
+        {"name": "ELIETH", "role": "Healer"},
+        {"name": "Fenjaa", "role": "Damage Dealer"}
+    ],
+    "Fillers": [
+        {"name": "Kringe2zla", "role": "Damage Dealer"},
+        {"name": "klamidiah", "role": "Damage Dealer"},
+        {"name": "iiwk", "role": "Damage Dealer"},
+        {"name": "DimeXX", "role": "Damage Dealer"},
+        {"name": "Fufuqt", "role": "Damage Dealer"},
+        {"name": "Sixstream", "role": "Healer"},
+        {"name": "Artemis03", "role": "Damage Dealer"}
     ]
 }

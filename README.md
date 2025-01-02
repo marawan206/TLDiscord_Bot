@@ -1,65 +1,76 @@
 # Throne and Liberty Discord Bot
 
-A Discord bot designed to manage teams, events, and attendance for the Throne and Liberty (TL) gaming community. The bot features team management, event scheduling, and attendance tracking capabilities.
+A comprehensive Discord bot for managing Throne and Liberty (TL) gaming community, featuring enhanced attendance tracking, event management, and team organization capabilities.
 
 ## Features
 
-- **Event Management**
-  - Automatic event extraction from announcements
-  - Manual event addition
-  - Daily event schedule viewing
-  
-- **Team Management**
+### Event Management
+- **Automatic Event Detection**
+  - Monitors specific channels for event announcements
+  - Uses Groq AI to extract event details automatically
+  - Supports manual event addition by administrators
+
+### Attendance System
+- **Advanced Attendance Tracking**
+  - Automatic voice channel attendance monitoring
+  - Persistent attendance records stored in JSON format
+  - Historical attendance data tracking
+  - Team completion status checking
+
+### Team Management
+- **Comprehensive Team Organization**
+  - Role-based team structure (Healers, Damage Dealers, Tanks)
   - Team composition tracking
-  - Role-based organization (Healers, Damage Dealers, Tanks)
-  - Team member status checking
-  
-- **Attendance Tracking**
-  - Real-time attendance monitoring
-  - Role-based attendance summaries
-  - Team completion status
-  
-- **User Information**
-  - Player role lookup
-  - Team assignment checking
-  - Individual team status viewing
+  - Special team designations (e.g., "Bombers" team)
+  - Individual team member status
+
+### User Information
+- **Detailed Member Tracking**
+  - Role and team lookup
+  - Special user recognitions
+  - Team assignment verification
+  - Current status checking
 
 ## Prerequisites
 
 - Python 3.8+
-- discord.py library
-- Groq API access
+- Required Python packages:
+  ```
+  discord.py
+  pytz
+  groq
+  ```
 - Discord Bot Token
-- Required Python packages (see requirements.txt)
+- Groq API Key
 
-## Installation
+## Configuration Files
 
-1. Clone the repository:
-```bash
-git clone [repository-url]
-```
-
-2. Install required packages:
-```bash
-pip install -r requirements.txt
-```
-
-3. Create a `config.json` file with your credentials:
+### config.json
 ```json
 {
     "TOKEN": "your-discord-bot-token",
-    "GROQ_API_KEY": "your-groq-api-key"
+    "GROQ_API_KEY": "your-groq-api-key",
+    "CHANNEL_IDS": {
+        "TEXT": "your-text-channel-id",
+        "VOICE": "your-voice-channel-id",
+        "WATCHED": "your-watched-channel-id"
+    },
+    "ROLE_IDS": {
+        "ADMIN": "your-admin-role-id",
+        "HIGHER_ADMIN": "your-higher-admin-role-id",
+        "MEMBER": "your-member-role-id"
+    }
 }
 ```
 
-4. Create a `teams.json` file to define your teams structure:
+### teams.json
 ```json
 {
     "Team1": [
         {"name": "Player1", "role": "Healer"},
         {"name": "Player2", "role": "Tank"}
     ],
-    "Team2": [
+    "Bombers": [
         {"name": "Player3", "role": "Damage Dealer"},
         {"name": "Player4", "role": "Healer"}
     ]
@@ -68,35 +79,74 @@ pip install -r requirements.txt
 
 ## Commands
 
+### General Commands
 - `!commands` - Display all available commands
-- `!attendance` - Show attendance summary (Admin only)
-- `!myteam` - Display your team's information
-- `!add <name> <time> [description]` - Add a new event (Admin only)
 - `!today` - Show today's scheduled events
-- `!whois <username>` - Show role and team information for a user
+- `!whois <username>` - Look up user information
 
-## Configuration
+### Team Commands
+- `!myteam` - View your team's information and members
 
-Update the following constants in the code:
-- `ADMIN_ROLE_ID` - Discord role ID for administrators
-- `HIGHER_ADMIN_ROLE_ID` - Discord role ID for higher administrators
-- `MEMBER_ROLE_ID` - Discord role ID for regular members
-- `WATCHED_CHANNEL_ID` - Channel ID for event announcements
-- `TEXT_CHANNEL_ID` - Main text channel ID
-- `VOICE_CHANNEL_ID` - Voice channel ID for attendance tracking
+### Admin Commands
+- `!attendance` - Record and display attendance (Admin only)
+- `!add <name> <time> [description]` - Add new events (Admin only)
 
-## Running the Bot
+## File Structure
+```
+├── bot.py
+├── config.json
+├── teams.json
+├── schedule.json
+├── attendance.json
+└── README.md
+```
 
+## New Features and Updates
+
+### Attendance System
+- Enhanced attendance tracking with persistent storage
+- Historical attendance records
+- Automatic voice channel monitoring
+- Team completion checking
+
+### Event Management
+- AI-powered event extraction using Groq
+- Automatic event scheduling from announcements
+- Manual event addition capability
+
+### Special Features
+- Special recognition for specific users/roles
+- Team-specific messages (e.g., Bomber Group designation)
+- Timezone support (CET)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone [repository-url]
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Set up configuration files:
+   - Create `config.json` with your credentials
+   - Set up `teams.json` with your team structure
+   - Ensure proper permissions for JSON files
+
+4. Run the bot:
 ```bash
 python bot.py
 ```
 
 ## Security Notes
 
-- Keep your Discord bot token and API keys secure
-- Don't share your config.json file
-- Regularly rotate security credentials
-- Use role-based access control for administrative commands
+- Store sensitive credentials in config.json (not in code)
+- Implement proper role-based access control
+- Regular credential rotation
+- Backup attendance and schedule data
 
 ## Contributing
 
@@ -106,7 +156,9 @@ python bot.py
 4. Push to the branch
 5. Create a Pull Request
 
-
 ## Support
 
-For support, please join our Discord server or create an issue in the repository.
+For support, please:
+1. Check the existing documentation
+2. Contact server administrators
+3. Create an issue in the repository

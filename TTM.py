@@ -21,7 +21,7 @@ ADMIN_ROLE_ID =        # Normal Admin Role
 HIGHER_ADMIN_ROLE_ID =   # Higher Admin Role
 MEMBER_ROLE_ID = 
 
-# Announcement channel and David's ID
+# Announcement channel
 WATCHED_CHANNEL_ID = 
 TARGET_USER_ID = 
 
@@ -43,6 +43,24 @@ def load_teams():
     return {}
 
 teams = load_teams()
+
+# Attendance data file
+ATTENDANCE_FILE = "attendance.json"
+
+# Load attendance data from file
+def load_attendance():
+    if os.path.exists(ATTENDANCE_FILE):
+        with open(ATTENDANCE_FILE, "r") as file:
+            return json.load(file)
+    return {}
+
+# Save attendance data to file
+def save_attendance(data):
+    with open(ATTENDANCE_FILE, "w") as file:
+        json.dump(data, file, indent=4)
+
+# Attendance data
+attendance_data = load_attendance()
 
 # Groq Client Setup
 client = Groq(api_key=GROQ_API_KEY)
@@ -143,10 +161,6 @@ async def show_commands(ctx):
     response += "**!commands** - Show this help message.\n"
     response += "**!attendance** - (Admins only) Show attendance summary.\n"
     response += "**!myteam** - Show your team's online members.\n"
-    response += "**!add <name> <time (HH:MM)> [description]** - (Admins only) Add a new event.\n"
-    response += "**!today** - Show today's scheduled events.\n"
-    response += "**!whois <username>** - Show the role and team of a user.\n"
-    response += "Example: `!whois john_doe`\n"
     await ctx.send(response)
 
 # Command: Add a new event (Admins only)
@@ -183,6 +197,7 @@ async def add_event_error(ctx, error):
         await ctx.send("❌ You don't have permission to use this command.")
 
 # Command: Show Attendance Summary (Admins only)
+# Command: Record attendance
 @bot.command(name="attendance")
 @commands.check(is_admin)
 async def attendance(ctx):
@@ -196,47 +211,25 @@ async def attendance(ctx):
     # Collect all attendees and sort alphabetically by display name
     attendees = sorted([member.display_name for member in voice_channel.members])
 
-    role_count = {"Healer": 0, "Damage Dealer": 0, "Tank": 0}
-    teams_status = {team: {"present": [], "missing": []} for team in teams.keys()}
-    fillers = teams.get("Fillers", [])
+    # Save attendance to local data
+    today = datetime.now().strftime("%Y-%m-%d")
+    if today not in attendance_data:
+        attendance_data[today] = []
+    attendance_data[today].extend(attendees)
+    attendance_data[today] = list(set(attendance_data[today]))  # Remove duplicates
+    save_attendance(attendance_data)
 
-    for team, members in teams.items():
-        for member in members:
-            if member["name"] in attendees:
-                role_count[member["role"]] += 1
-                teams_status[team]["present"].append(member["name"])
-            else:
-                teams_status[team]["missing"].append(member["name"])
-
-    # Build the attendance summary
-    summary = "**Attendance Summary**\n"
-    for team, status in teams_status.items():
-        if not status["missing"]:
-            summary += f"- **{team}**: ✅ Full team\n"
-        else:
-            missing_members = ", ".join(status["missing"])
-            summary += f"- **{team}**: ❌ Missing {missing_members}\n"
-
-            # Suggest Fillers for missing slots
-            if fillers:
-                available_fillers = ", ".join([filler["name"] for filler in fillers])
-                summary += f"  👉 Suggested Fillers: {available_fillers}\n"
-
-    summary += "\n**Role Count**\n"
-    for role, count in role_count.items():
-        summary += f"- {role}s: {count}\n"
-
-    # Add all attendees (sorted alphabetically)
-    summary += "\n**All Attendees**\n"
-    summary += "\n".join([f"- {attendee}" for attendee in attendees]) if attendees else "- None\n"
-
-    await ctx.send(summary)
+    # Send the list of attendees to the text channel
+    response = "**Today's Attendance:**\n" + "\n".join(f"- {attendee}" for attendee in attendees) if attendees else "- None"
+    text_channel = guild.get_channel(TEXT_CHANNEL_ID)
+    if text_channel:
+        await text_channel.send(response)
+    await ctx.send("✅ Attendance recorded and posted to the text channel!")
 
 @attendance.error
 async def attendance_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
         await ctx.send("❌ You don't have permission to use this command.")
-
 
 # Command: Show User Role and Team
 @bot.command(name="whois")
@@ -245,8 +238,8 @@ async def whois(ctx, *, nickname: str = None):
         await ctx.send("❌ Usage: `!whois <nickname>`")
         return
 
-    # Special case for "phow_david" 
-    if nickname.lower() == "phow_david":
+    # Special case for "user" 
+    if nickname.lower() == "user":
         await ctx.send("Guild Leader")
         return
 
@@ -308,6 +301,8 @@ async def today(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error fetching today's events: {e}")
 
+        
+# Command: Show My Team
 # Command: Show My Team
 @bot.command(name="myteam")
 async def myteam(ctx):
@@ -340,6 +335,6 @@ async def myteam(ctx):
         response += "\n**BOMBER GROUP** 💣"
 
     await ctx.send(response)
-
+   
 # Run the bot
 bot.run(TOKEN)
