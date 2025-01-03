@@ -161,6 +161,10 @@ async def show_commands(ctx):
     response += "**!commands** - Show this help message.\n"
     response += "**!attendance** - (Admins only) Show attendance summary.\n"
     response += "**!myteam** - Show your team's online members.\n"
+    response += "**!add <name> <time (HH:MM)> [description]** - (Admins only) Add a new event.\n"
+    response += "**!today** - Show today's scheduled events.\n"
+    response += "**!whois <username>** - Show the role and team of a user.\n"
+    response += "Example: `!whois john_doe`\n"
     await ctx.send(response)
 
 # Command: Add a new event (Admins only)
