@@ -50,8 +50,11 @@ ATTENDANCE_FILE = "attendance.json"
 # Load attendance data from file
 def load_attendance():
     if os.path.exists(ATTENDANCE_FILE):
-        with open(ATTENDANCE_FILE, "r") as file:
-            return json.load(file)
+        try:
+            with open(ATTENDANCE_FILE, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except json.JSONDecodeError:
+            print("Error: Invalid JSON format in attendance file.")
     return {}
 
 # Save attendance data to file
