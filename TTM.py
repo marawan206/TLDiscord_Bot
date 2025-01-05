@@ -47,7 +47,7 @@ teams = load_teams()
 # Attendance data file
 ATTENDANCE_FILE = "attendance.json"
 
-# Load attendance data from file
+# Load attendance data from file# Load attendance data from file
 def load_attendance():
     if os.path.exists(ATTENDANCE_FILE):
         try:
@@ -57,11 +57,34 @@ def load_attendance():
             print("Error: Invalid JSON format in attendance file.")
     return {}
 
-# Save attendance data to file
-def save_attendance(data):
-    with open(ATTENDANCE_FILE, "w") as file:
-        json.dump(data, file, indent=4)
 
+# Save attendance data to file
+def save_attendance(event_name, attendees):
+    try:
+        # Load existing attendance data
+        with open("attendance.json", "r", encoding="utf-8") as file:
+            attendance_data = json.load(file)
+    except FileNotFoundError:
+        attendance_data = {}  # Initialize if file doesn't exist
+
+    # Get today's date as a string
+    today = datetime.now().date().isoformat()
+
+    # Ensure the date exists in the data
+    if today not in attendance_data:
+        attendance_data[today] = {}
+
+    # Save the event's attendance
+    attendance_data[today][event_name] = {
+        "time": datetime.now().strftime("%H:%M"),
+        "attendees": attendees
+    }
+
+    # Write the updated data back to the file
+    with open("attendance.json", "w", encoding="utf-8") as file:
+        json.dump(attendance_data, file, indent=4, ensure_ascii=False)
+
+        
 # Attendance data
 attendance_data = load_attendance()
 
