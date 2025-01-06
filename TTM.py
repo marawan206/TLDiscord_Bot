@@ -153,7 +153,6 @@ def process_with_groq(message_content):
         print(f"Error processing message with Groq API: {e}")
     return []
 
-
 # Event Listener: On Message
 @bot.event
 async def on_message(message):
