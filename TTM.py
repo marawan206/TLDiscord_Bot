@@ -252,33 +252,33 @@ async def add_event_error(ctx, error):
 # Command: Show Attendance Summary (Admins only)
 # Command: Record attendance
 @bot.command(name="attendance")
-@commands.check(is_admin)
-async def attendance(ctx):
+@commands.check(is_admin)  # Ensure this decorator is applied
+async def attendance(ctx, *, event_name: str = "default"):
+    # Get the voice channel
     guild = ctx.guild
     voice_channel = guild.get_channel(VOICE_CHANNEL_ID)
 
     if not voice_channel:
-        await ctx.send("Voice channel not found! Check the channel ID.")
+        await ctx.send("❌ Voice channel not found! Check the channel ID.")
         return
 
-    # Collect all attendees and sort alphabetically by display name
+    # Get attendees in the voice channel
     attendees = sorted([member.display_name for member in voice_channel.members])
+    if not attendees:
+        await ctx.send("❌ No attendees found in the voice channel.")
+        return
 
-    # Save attendance to local data
-    today = datetime.now().strftime("%Y-%m-%d")
-    if today not in attendance_data:
-        attendance_data[today] = []
-    attendance_data[today].extend(attendees)
-    attendance_data[today] = list(set(attendance_data[today]))  # Remove duplicates
-    save_attendance(attendance_data)
-
-    # Send the list of attendees to the text channel
-    response = "**Today's Attendance:**\n" + "\n".join(f"- {attendee}" for attendee in attendees) if attendees else "- None"
-    text_channel = guild.get_channel(TEXT_CHANNEL_ID)
-    if text_channel:
-        await text_channel.send(response)
-    await ctx.send("✅ Attendance recorded and posted to the text channel!")
-
+    # Save attendance to JSON file
+    save_attendance(event_name, attendees)
+    
+    # Respond with attendance details
+    attendee_count = len(attendees)
+    attendee_list = ', '.join(attendees)
+    await ctx.send(
+        f"✅ Attendance for event '{event_name}' has been recorded!\n"
+        f"**Total Attendees:** {attendee_count}\n"
+        f"**Attendees:** {attendee_list}"
+    )
 @attendance.error
 async def attendance_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
