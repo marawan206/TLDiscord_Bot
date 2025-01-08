@@ -322,8 +322,6 @@ async def whois(ctx, *, nickname: str = None):
     # Send user role and team info if found
     if user_role and user_team:
         response = f"**{search_name}** is a **{user_role}** and is currently assigned to **{user_team}**."
-        if user_team == "Bombers":
-            response += "\n**BOMBER GROUP** 💣"
         await ctx.send(response)
     else:
         await ctx.send(f"❌ No information found for **{search_name}**.")
