@@ -252,33 +252,33 @@ async def add_event_error(ctx, error):
 # Command: Show Attendance Summary (Admins only)
 # Command: Record attendance
 @bot.command(name="attendance")
-@commands.check(is_admin)  # Ensure this decorator is applied
-async def attendance(ctx, *, event_name: str = "default"):
-    # Get the voice channel
+@commands.check(is_admin)
+async def attendance(ctx):
     guild = ctx.guild
     voice_channel = guild.get_channel(VOICE_CHANNEL_ID)
 
     if not voice_channel:
-        await ctx.send("❌ Voice channel not found! Check the channel ID.")
+        await ctx.send("Voice channel not found! Check the channel ID.")
         return
 
-    # Get attendees in the voice channel
+    # Collect all attendees and sort alphabetically by display name
     attendees = sorted([member.display_name for member in voice_channel.members])
-    if not attendees:
-        await ctx.send("❌ No attendees found in the voice channel.")
-        return
 
-    # Save attendance to JSON file
-    save_attendance(event_name, attendees)
-    
-    # Respond with attendance details
-    attendee_count = len(attendees)
-    attendee_list = ', '.join(attendees)
-    await ctx.send(
-        f"✅ Attendance for event '{event_name}' has been recorded!\n"
-        f"**Total Attendees:** {attendee_count}\n"
-        f"**Attendees:** {attendee_list}"
-    )
+    # Save attendance to local data
+    today = datetime.now().strftime("%Y-%m-%d")
+    if today not in attendance_data:
+        attendance_data[today] = []
+    attendance_data[today].extend(attendees)
+    attendance_data[today] = list(set(attendance_data[today]))  # Remove duplicates
+    save_attendance(attendance_data)
+
+    # Send the list of attendees to the text channel
+    response = "**Today's Attendance:**\n" + "\n".join(f"- {attendee}" for attendee in attendees) if attendees else "- None"
+    text_channel = guild.get_channel(TEXT_CHANNEL_ID)
+    if text_channel:
+        await text_channel.send(response)
+    await ctx.send("✅ Attendance recorded and posted to the text channel!")
+
 @attendance.error
 async def attendance_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
@@ -322,6 +322,8 @@ async def whois(ctx, *, nickname: str = None):
     # Send user role and team info if found
     if user_role and user_team:
         response = f"**{search_name}** is a **{user_role}** and is currently assigned to **{user_team}**."
+        if user_team == "Bombers":
+            response += "\n**BOMBER GROUP** 💣"
         await ctx.send(response)
     else:
         await ctx.send(f"❌ No information found for **{search_name}**.")
@@ -386,6 +388,88 @@ async def myteam(ctx):
         response += "\n**BOMBER GROUP** 💣"
 
     await ctx.send(response)
-   
+
+# Command: Check personal attendance
+@bot.command(name="myatt")
+async def my_attendance(ctx):
+    user_name = ctx.author.display_name
+    try:
+        # Load attendance data
+        with open("attendance.json", "r", encoding="utf-8") as file:
+            attendance_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        await ctx.send("No attendance records found.")
+        return
+
+    # Get the dates from your attendance data
+    dates = sorted(list(attendance_data.keys()))
+    if not dates:
+        await ctx.send("No attendance records found.")
+        return
+
+    # Get the most recent date
+    latest_date = datetime.strptime(dates[-1], "%Y-%m-%d").date()
+    
+    # Calculate week ranges based on the latest date
+    start_of_this_week = latest_date - timedelta(days=latest_date.weekday())
+    start_of_last_week = start_of_this_week - timedelta(days=7)
+    
+    days_this_week = [(start_of_this_week + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+    days_last_week = [(start_of_last_week + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
+    def calculate_attendance(days):
+        total_events = 0
+        attended_events = 0
+        missed_events = []
+
+        for day in days:
+            if day in attendance_data:
+                for event, details in attendance_data[day].items():
+                    total_events += 1
+                    if user_name in details["attendees"]:
+                        attended_events += 1
+                    else:
+                        missed_events.append(f"**{event}** at {details['time']} on {day}")
+            else:
+                missed_events.append(f"**No events recorded on {day}**")
+
+        attendance_percentage = (attended_events / total_events) * 100 if total_events > 0 else 0
+        return {
+            "total_events": total_events,
+            "attended_events": attended_events,
+            "attendance_percentage": attendance_percentage,
+            "missed_events": "\n".join(missed_events) if missed_events else "None",
+        }
+
+    # Calculate attendance for this week and last week
+    this_week_data = calculate_attendance(days_this_week)
+    last_week_data = calculate_attendance(days_last_week)
+
+    # Format responses for this week and last week
+    this_week_response = (
+        f"**This Week's Attendance Details:**\n"
+        f"Attendance Rate: **{this_week_data['attendance_percentage']:.2f}%**\n"
+        f"Total Events Attended: **{this_week_data['attended_events']}/{this_week_data['total_events']}**\n\n"
+        f"**Missed Events and Days:**\n{this_week_data['missed_events']}\n\n"
+        if this_week_data["total_events"] > 0
+        else "**This Week's Attendance Details:**\nNo attendance recorded this week yet.\n\n"
+    )
+
+    last_week_start_date = start_of_last_week.strftime("%Y-%m-%d")
+    last_week_response = (
+        f"**Last Week's Attendance Details (Week of {last_week_start_date}):**\n"
+        f"Attendance Rate: **{last_week_data['attendance_percentage']:.2f}%**\n"
+        f"Total Events Attended: **{last_week_data['attended_events']}/{last_week_data['total_events']}**\n\n"
+        f"**Missed Events and Days:**\n{last_week_data['missed_events']}\n\n"
+        if last_week_data["total_events"] > 0
+        else f"**Last Week's Attendance Details (Week of {last_week_start_date}):**\nNo attendance recorded last week.\n\n"
+    )
+
+    # Prepare the full response
+    response = f"{this_week_response}{last_week_response}"
+
+    # Send the response
+    await ctx.send(response)
+    
 # Run the bot
 bot.run(TOKEN)
