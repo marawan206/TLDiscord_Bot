@@ -17,17 +17,17 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Role IDs
-ADMIN_ROLE_ID =        # Normal Admin Role
-HIGHER_ADMIN_ROLE_ID =   # Higher Admin Role
-MEMBER_ROLE_ID = 
+ADMIN_ROLE_ID = ""       # Normal Admin Role
+HIGHER_ADMIN_ROLE_ID = ""   # Higher Admin Role
+MEMBER_ROLE_ID = ""
 
 # Announcement channel
-WATCHED_CHANNEL_ID = 
-TARGET_USER_ID = 
+WATCHED_CHANNEL_ID = "" 
+TARGET_USER_ID = ""
 
 # Channel IDs
-TEXT_CHANNEL_ID = 
-VOICE_CHANNEL_ID = 
+TEXT_CHANNEL_ID = ""
+VOICE_CHANNEL_ID = ""
 
 # Load team data from a JSON file
 def load_teams():
@@ -47,7 +47,7 @@ teams = load_teams()
 # Attendance data file
 ATTENDANCE_FILE = "attendance.json"
 
-# Load attendance data from file# Load attendance data from file
+# Load attendance data from file
 def load_attendance():
     if os.path.exists(ATTENDANCE_FILE):
         try:
@@ -84,7 +84,6 @@ def save_attendance(event_name, attendees):
     with open("attendance.json", "w", encoding="utf-8") as file:
         json.dump(attendance_data, file, indent=4, ensure_ascii=False)
 
-        
 # Attendance data
 attendance_data = load_attendance()
 
@@ -153,6 +152,7 @@ def process_with_groq(message_content):
         print(f"Error processing message with Groq API: {e}")
     return []
 
+
 # Event Listener: On Message
 @bot.event
 async def on_message(message):
@@ -178,7 +178,6 @@ def is_admin(ctx):
     admin_role = discord.utils.get(ctx.guild.roles, id=ADMIN_ROLE_ID)
     higher_admin_role = discord.utils.get(ctx.guild.roles, id=HIGHER_ADMIN_ROLE_ID)
     return admin_role in ctx.author.roles or higher_admin_role in ctx.author.roles
-
 
 # Command: Show Commands List
 @bot.command(name="commands")
@@ -252,37 +251,41 @@ async def add_event_error(ctx, error):
 # Command: Show Attendance Summary (Admins only)
 # Command: Record attendance
 @bot.command(name="attendance")
-@commands.check(is_admin)
-async def attendance(ctx):
+@commands.check(is_admin)  # Ensure this decorator is applied
+async def attendance(ctx, *, event_name: str = "default"):
+    # Get the voice channel
     guild = ctx.guild
     voice_channel = guild.get_channel(VOICE_CHANNEL_ID)
 
     if not voice_channel:
-        await ctx.send("Voice channel not found! Check the channel ID.")
+        await ctx.send("❌ Voice channel not found! Check the channel ID.")
         return
 
-    # Collect all attendees and sort alphabetically by display name
+    # Get attendees in the voice channel
     attendees = sorted([member.display_name for member in voice_channel.members])
+    if not attendees:
+        await ctx.send("❌ No attendees found in the voice channel.")
+        return
 
-    # Save attendance to local data
-    today = datetime.now().strftime("%Y-%m-%d")
-    if today not in attendance_data:
-        attendance_data[today] = []
-    attendance_data[today].extend(attendees)
-    attendance_data[today] = list(set(attendance_data[today]))  # Remove duplicates
-    save_attendance(attendance_data)
+    # Save attendance to JSON file
+    save_attendance(event_name, attendees)
+    
+    # Respond with attendance details
+    attendee_count = len(attendees)
+    attendee_list = ', '.join(attendees)
+    await ctx.send(
+        f"✅ Attendance for event '{event_name}' has been recorded!\n"
+        f"**Total Attendees:** {attendee_count}\n"
+        f"**Attendees:** {attendee_list}"
+    )
 
-    # Send the list of attendees to the text channel
-    response = "**Today's Attendance:**\n" + "\n".join(f"- {attendee}" for attendee in attendees) if attendees else "- None"
-    text_channel = guild.get_channel(TEXT_CHANNEL_ID)
-    if text_channel:
-        await text_channel.send(response)
-    await ctx.send("✅ Attendance recorded and posted to the text channel!")
-
+# Handle errors for the attendance command
 @attendance.error
 async def attendance_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
         await ctx.send("❌ You don't have permission to use this command.")
+    else:
+        await ctx.send(f"❌ An error occurred: {str(error)}")
 
 # Command: Show User Role and Team
 @bot.command(name="whois")
@@ -291,9 +294,9 @@ async def whois(ctx, *, nickname: str = None):
         await ctx.send("❌ Usage: `!whois <nickname>`")
         return
 
-    # Special case for "user" 
-    if nickname.lower() == "user":
-        await ctx.send("Guild Leader")
+    # Special case for "phow_david" 
+    if nickname.lower() == "phow_david":
+        await ctx.send("OUR KING, THE REAL GIGACHAD\nhttps://tenor.com/view/gigachad-chad-gif-20773266")
         return
 
     user_role = None
@@ -388,7 +391,7 @@ async def myteam(ctx):
         response += "\n**BOMBER GROUP** 💣"
 
     await ctx.send(response)
-
+    
 # Command: Check personal attendance
 @bot.command(name="myatt")
 async def my_attendance(ctx):
@@ -470,7 +473,6 @@ async def my_attendance(ctx):
 
     # Send the response
     await ctx.send(response)
-
     
 @bot.command(name="details")
 @commands.has_permissions(administrator=True)
@@ -589,6 +591,6 @@ async def details(ctx, discord_name: str):
     await ctx.send(response)
     
     
-    
+     
 # Run the bot
 bot.run(TOKEN)
